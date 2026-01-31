@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Your Cart | Comfort Desk</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-dark text-white">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-black sticky-top border-bottom border-secondary py-3">
+    <div class="container">
+        <a class="navbar-brand fw-bold fs-3 branding-logo" href="../index.html">
+            COMFORT<span class="text-primary">DESK</span>
+        </a>
+
+        <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#comfortNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="comfortNav">
+            <ul class="navbar-nav ms-auto align-items-center">
+                <li class="nav-item px-2">
+                    <a class="nav-link" href="../index.html">Home</a>
+                </li>
+                <li class="nav-item px-2">
+                    <a class="nav-link" href="product.html">Chairs</a>
+                </li>
+                <li class="nav-item px-2">
+                    <a class="nav-link" href="info.html">Support</a>
+                </li>
+                
+                <li class="nav-item px-3">
+                    <a href="cart.html" class="nav-link position-relative d-inline-block">
+                        <i class="bi bi-cart3 fs-5"></i>
+                        <span id="navCartCount" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-primary" style="font-size: 0.65rem;">
+                            0
+                        </span>
+                    </a>
+                </li>
+
+                <li class="nav-item ms-lg-3">
+                    <a id="navAuthBtn" href="login.html" class="btn btn-primary rounded-pill px-4 fw-bold shadow-sm">
+                        Login
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+
+    <div class="container py-5">
+        <h2 class="fw-bold mb-4">Shopping <span class="text-primary">Cart</span></h2>
+        
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="glass-card p-4 h-100">
+                    <div id="cartItemsList">
+                        <div class="text-center py-5">
+                            <i class="bi bi-cart-x display-1 text-secondary"></i>
+                            <p class="mt-3">Your cart is empty.</p>
+                            <a href="product.html" class="btn btn-outline-primary">Continue Shopping</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-4">
+                <div class="glass-card p-4 sticky-top" style="top: 100px;">
+                    <h4 class="fw-bold mb-4">Order Summary</h4>
+                    
+                    <div class="d-flex justify-content-between mb-2">
+                        <span class="text-secondary">Subtotal</span>
+                        <span id="subtotalPrice">$0.00</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3">
+                        <span class="text-secondary">Shipping</span>
+                        <span class="text-success">FREE</span>
+                    </div>
+                    <hr class="border-secondary">
+                    <div class="d-flex justify-content-between mb-4">
+                        <span class="fw-bold">Total</span>
+                        <span class="fs-4 fw-bold text-primary" id="totalPrice">$0.00</span>
+                    </div>
+
+                    <div class="form-check mb-4 p-3 rounded bg-black border border-secondary">
+                        <input class="form-check-input ms-0 me-2" type="checkbox" id="termsCheck">
+                        <label class="form-check-label small text-secondary" for="termsCheck">
+                            I agree to the <a href="info.html" class="text-primary text-decoration-none">Terms & Conditions</a>
+                        </label>
+                    </div>
+
+                    <button id="checkoutBtn" class="btn btn-primary w-100 py-3 fw-bold rounded-pill shadow" disabled>
+                        PROCEED TO CHECKOUT
+                    </button>
+                    
+                    <div class="mt-3 text-center">
+                        <img src="https://img.icons8.com/color/48/000000/visa.png" width="30">
+                        <img src="https://img.icons8.com/color/48/000000/mastercard.png" width="30" class="mx-2">
+                        <img src="https://img.icons8.com/color/48/000000/paypal.png" width="30">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="../js/cart-logic.js"></script>
+</body>
+</html>

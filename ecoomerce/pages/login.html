@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login | Comfort Desk</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/style.css">
+    <style>
+        body {
+            background: radial-gradient(circle at top right, #1e1e24, #0f0f13);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+        .auth-container {
+            max-width: 450px;
+            width: 100%;
+            margin: auto;
+        }
+        .auth-card {
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+        }
+        .form-control {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white !important;
+            padding: 12px 15px;
+        }
+        .form-control:focus {
+            background: rgba(0, 0, 0, 0.3);
+            border-color: #007bff;
+            box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.15);
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <div class="auth-container">
+        <div class="text-center mb-4">
+            <a href="../index.html" class="text-decoration-none">
+                <h2 class="fw-800 text-white">COMFORT<span class="text-primary">DESK</span></h2>
+            </a>
+        </div>
+
+        <div class="auth-card">
+            <h3 class="fw-bold mb-1" id="formTitle">Welcome Back</h3>
+            <p class="text-secondary small mb-4" id="formSubtitle">Please enter your details to sign in.</p>
+
+            <form id="authForm">
+                <div class="mb-3">
+                    <label class="form-label small text-secondary">Email Address</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-secondary text-secondary">
+                            <i class="bi bi-envelope"></i>
+                        </span>
+                        <input type="email" id="email" class="form-control" placeholder="name@example.com" required>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <label class="form-label small text-secondary">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text bg-transparent border-secondary text-secondary">
+                            <i class="bi bi-lock"></i>
+                        </span>
+                        <input type="password" id="password" class="form-control" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <button type="submit" id="submitBtn" class="btn btn-primary w-100 py-3 fw-bold rounded-pill mb-3 shadow">
+                    SIGN IN
+                </button>
+            </form>
+
+            <div class="text-center">
+                <p class="small text-secondary" id="toggleText">
+                    Don't have an account? 
+                    <a href="javascript:void(0)" onclick="toggleAuth()" class="text-primary text-decoration-none fw-bold">Create one</a>
+                </p>
+            </div>
+        </div>
+
+        <div class="text-center mt-4">
+            <a href="../index.html" class="text-secondary text-decoration-none small">
+                <i class="bi bi-arrow-left me-1"></i> Back to Home
+            </a>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+
+    // Your Config
+    const firebaseConfig = {
+        apiKey: "AIzaSyAeSNIxXzWSjjrI0FouZjQZIN2-6wH-a2Y",
+        authDomain: "comfort-desk.firebaseapp.com",
+        projectId: "comfort-desk",
+        appId: "1:109687131068:web:f42451da43c01ac5e479b9",
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+
+    let isLogin = true;
+
+    // Toggle between Login and Register
+    window.toggleAuth = () => {
+        isLogin = !isLogin;
+        document.getElementById('formTitle').innerText = isLogin ? "Welcome Back" : "Join the Club";
+        document.getElementById('formSubtitle').innerText = isLogin ? "Please enter your details to sign in." : "Create an account to start shopping.";
+        document.getElementById('submitBtn').innerText = isLogin ? "SIGN IN" : "CREATE ACCOUNT";
+        document.getElementById('toggleText').innerHTML = isLogin 
+            ? 'Don\'t have an account? <a href="javascript:void(0)" onclick="toggleAuth()" class="text-primary text-decoration-none fw-bold">Create one</a>'
+            : 'Already a member? <a href="javascript:void(0)" onclick="toggleAuth()" class="text-primary text-decoration-none fw-bold">Sign In</a>';
+    };
+
+    // Form Submission
+    document.getElementById('authForm').addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('email').value;
+        const password = document.getElementById('password').value;
+
+        const action = isLogin 
+            ? signInWithEmailAndPassword(auth, email, password)
+            : createUserWithEmailAndPassword(auth, email, password);
+
+        action.then(() => {
+            window.location.href = "dashboard.html";
+        }).catch(err => {
+            alert(err.message);
+        });
+    });
+</script>
+
+</body>
+</html>

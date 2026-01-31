@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Comfort Desk</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../css/style.css">
+</head>
+<body class="bg-dark text-white">
+
+    <nav class="navbar navbar-expand-lg navbar-dark bg-black sticky-top border-bottom border-secondary py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold fs-3" href="../index.html">COMFORT<span class="text-primary">DESK</span></a>
+            <div class="ms-auto">
+                <a href="product.html" class="btn btn-outline-light btn-sm rounded-pill px-3 me-2">Back to Shop</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container py-5">
+        <div class="row g-4">
+            <div class="col-lg-4">
+                <div class="glass-card p-4 text-center">
+                    <div class="position-relative d-inline-block mb-3">
+                        <div id="userInitial" class="rounded-circle bg-primary d-flex align-items-center justify-content-center mx-auto shadow" style="width: 100px; height: 100px; font-size: 2.5rem; font-weight: 800; color: white;">
+                            ?
+                        </div>
+                    </div>
+                    <h4 id="userEmailDisplay" class="fw-bold mb-1">Loading...</h4>
+                    <p class="text-secondary small mb-4">Member since 2026</p>
+                    
+                    <div class="d-grid gap-2 border-top border-secondary pt-4">
+                        <button class="btn btn-dark text-start btn-sm py-2 mb-2"><i class="bi bi-person me-2"></i> Account Settings</button>
+                        <button id="logoutBtn" class="btn btn-outline-danger btn-sm py-2 rounded-pill">
+                            <i class="bi bi-box-arrow-right me-2"></i> Sign Out
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-8">
+                <div class="glass-card p-4 p-md-5 h-100">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h3 class="fw-bold mb-0">Order <span class="text-primary">History</span></h3>
+                        <span class="badge bg-primary rounded-pill" id="orderCount">0 Orders</span>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table class="table table-dark table-hover align-middle border-secondary">
+                            <thead class="text-secondary small">
+                                <tr>
+                                    <th>DATE</th>
+                                    <th>ITEMS</th>
+                                    <th>TOTAL</th>
+                                    <th>STATUS</th>
+                                </tr>
+                            </thead>
+                            <tbody id="orderList">
+                                <tr id="loadingRow">
+                                    <td colspan="4" class="text-center py-5">
+                                        <div class="spinner-border text-primary" role="status"></div>
+                                        <p class="mt-2 text-secondary">Fetching your orders...</p>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
+        import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-auth.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyAeSNIxXzWSjjrI0FouZjQZIN2-6wH-a2Y",
+            authDomain: "comfort-desk.firebaseapp.com",
+            databaseURL: "https://comfort-desk-default-rtdb.firebaseio.com",
+            projectId: "comfort-desk",
+            storageBucket: "comfort-desk.firebasestorage.app",
+            messagingSenderId: "109687131068",
+            appId: "1:109687131068:web:f42451da43c01ac5e479b9",
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // 1. Auth & Data Listener
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                // Set Profile Info
+                document.getElementById('userEmailDisplay').innerText = user.email;
+                document.getElementById('userInitial').innerText = user.email.charAt(0).toUpperCase();
+
+                // Fetch User Orders
+                const ordersRef = ref(db, 'orders/' + user.uid);
+                onValue(ordersRef, (snapshot) => {
+                    const data = snapshot.val();
+                    renderOrders(data);
+                });
+            } else {
+                // If not logged in, redirect to home
+                window.location.href = "../index.html";
+            }
+        });
+
+        // 2. Render Orders to Table
+        function renderOrders(orders) {
+            const list = document.getElementById('orderList');
+            const countBadge = document.getElementById('orderCount');
+            
+            if (!orders) {
+                list.innerHTML = '<tr><td colspan="4" class="text-center py-5 text-secondary">No orders found yet. <a href="product.html" class="text-primary">Shop now</a></td></tr>';
+                countBadge.innerText = "0 Orders";
+                return;
+            }
+
+            const orderKeys = Object.keys(orders);
+            countBadge.innerText = `${orderKeys.length} Orders`;
+            
+            list.innerHTML = orderKeys.map(key => {
+                const order = orders[key];
+                return `
+                    <tr>
+                        <td class="small text-secondary">${new Date(order.timestamp).toLocaleDateString()}</td>
+                        <td><span class="small">${order.items.length} Product(s)</span></td>
+                        <td class="fw-bold text-primary">${order.total}</td>
+                        <td><span class="badge bg-success-subtle text-success border border-success px-3">PAID</span></td>
+                    </tr>
+                `;
+            }).reverse().join(''); // Show newest first
+        }
+
+        // 3. Logout Logic
+        document.getElementById('logoutBtn').addEventListener('click', () => {
+            signOut(auth).then(() => {
+                window.location.href = "../index.html";
+            }).catch(err => alert("Logout failed: " + err.message));
+        });
+    </script>
+</body>
+</html>
