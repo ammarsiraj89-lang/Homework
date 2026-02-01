@@ -38,26 +38,28 @@ const renderCart = () => {
     let total = 0;
     list.innerHTML = cart.map((item, index) => {
         total += item.price * item.quantity;
-        return `
-            <div class="row align-items-center mb-4 pb-4 border-bottom border-secondary">
-                <div class="col-3">
-                    <img src="${item.image}" class="img-fluid rounded shadow-sm" alt="${item.name}" style="max-height: 80px; object-fit: contain;">
-                </div>
-                <div class="col-5">
-                    <h5 class="fw-bold mb-0">${item.name}</h5>
-                    <p class="text-secondary small mb-0">$${item.price} per unit</p>
-                </div>
-                <div class="col-4 text-end">
-                    <div class="d-flex align-items-center justify-content-end">
-                        <button class="btn btn-sm btn-outline-secondary" onclick="updateQty(${index}, -1)">-</button>
-                        <span class="mx-3 fw-bold">${item.quantity}</span>
-                        <button class="btn btn-sm btn-outline-secondary" onclick="updateQty(${index}, 1)">+</button>
-                        <button class="btn btn-sm text-danger ms-3" onclick="removeItem(${index})"><i class="bi bi-trash"></i></button>
-                    </div>
-                    <div class="mt-2 fw-bold text-primary">$${(item.price * item.quantity).toFixed(2)}</div>
-                </div>
-            </div>
-        `;
+      // Inside your renderCart mapping function
+return `
+<div class="row align-items-center mb-4 pb-4 border-bottom border-secondary">
+    <div class="col-3 col-md-2">
+        <img src="${item.image}" class="img-fluid rounded shadow-sm" alt="product" style="max-height: 80px; object-fit: contain; background: white;">
+    </div>
+    <div class="col-5 col-md-6">
+        <h6 class="fw-bold mb-0 text-truncate">${item.name}</h6>
+        <p class="text-primary small fw-bold mb-0">$${item.price}</p>
+    </div>
+    <div class="col-4 text-end">
+        <div class="d-flex align-items-center justify-content-end mb-2">
+            <button class="btn btn-sm btn-outline-secondary" onclick="updateQty(${index}, -1)">-</button>
+            <span class="mx-2 fw-bold">${item.quantity}</span>
+            <button class="btn btn-sm btn-outline-secondary" onclick="updateQty(${index}, 1)">+</button>
+        </div>
+        <button class="btn btn-sm text-danger border-0 bg-transparent" onclick="removeItem(${index})">
+            <i class="bi bi-trash"></i>
+        </button>
+    </div>
+</div>
+`;
     }).join('');
 
     document.getElementById('subtotalPrice').innerText = `$${total.toFixed(2)}`;

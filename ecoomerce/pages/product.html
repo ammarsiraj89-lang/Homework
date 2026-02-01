@@ -89,7 +89,7 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/10.0.0/firebase-firestore.js";
-
+    
         const firebaseConfig = {
             apiKey: "AIzaSyAeSNIxXzWSjjrI0FouZjQZIN2-6wH-a2Y",
             authDomain: "comfort-desk.firebaseapp.com",
@@ -99,72 +99,107 @@
             appId: "1:109687131068:web:f42451da43c01ac5e479b9",
             measurementId: "G-ZJVVZYYNET"
         };
-
+    
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
-
+    
         // 1. LOAD PRODUCTS FROM FIRESTORE
         async function loadProducts() {
             const container = document.getElementById('productContainer');
             try {
                 const querySnapshot = await getDocs(collection(db, "products"));
                 container.innerHTML = ''; 
+    
+                // Inside your product.html forEach loop:
+querySnapshot.forEach((doc) => {
+    const product = doc.data();
+    const id = doc.id; // This is the unique Firestore ID (e.g., "chair123")
+    const img = product.Product_Image;
+    const name = product.Product_Name;
 
-                querySnapshot.forEach((doc) => {
-                    const product = doc.data();
-                    const id = doc.id;
-                    const img = product.Product_Image || 'https://via.placeholder.com/300';
-                    const name = product.Product_Name || 'Untitled Chair';
-                    const price = product.Price || 0;
-
-                    container.innerHTML += `
-                        <div class="col">
-                            <div class="card product-card h-100 bg-transparent overflow-hidden">
-                                <div class="p-3 bg-black text-center">
-                                    <img src="${img}" class="card-img-top" alt="${name}" style="height: 200px; object-fit: contain;">
-                                </div>
-                                <div class="card-body p-4 bg-dark">
-                                    <h5 class="fw-bold text-white mb-1">${name}</h5>
-                                    <p class="text-primary fw-bold fs-5 mb-3">$${price}</p>
-                                    <button onclick="addToCart('${id}', '${name}', ${price}, '${img}')" 
-                                            class="btn btn-outline-primary w-100 rounded-pill fw-bold">
-                                        ADD TO CART
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    `;
-                });
+    container.innerHTML += `
+        <div class="col">
+            <div class="card product-card h-100 bg-transparent border-secondary">
+                <a href="detail.html?id=${id}">
+                    <div class="p-3 bg-black">
+                        <img src="${img}" class="card-img-top" alt="${name}" style="height: 200px; object-fit: contain;">
+                    </div>
+                </a>
+                <div class="card-body p-4 bg-dark">
+                    <a href="detail.html?id=${id}" class="text-decoration-none">
+                        <h5 class="fw-bold text-white mb-1">${name}</h5>
+                    </a>
+                    <p class="text-primary fw-bold fs-5 mb-3">$${product.Price}</p>
+                    <button onclick="addToCart('${id}', '${name}', ${product.Price}, '${img}')" 
+                            class="btn btn-outline-primary w-100 rounded-pill fw-bold">
+                        ADD TO CART
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+});
                 updateCartBadge();
             } catch (err) {
                 console.error(err);
                 container.innerHTML = `<p class="text-danger">Error: ${err.message}</p>`;
             }
         }
-
+    
         // 2. ADD TO CART LOGIC
         window.addToCart = (id, name, price, image) => {
             let cart = JSON.parse(localStorage.getItem('chairCart')) || [];
             const index = cart.findIndex(item => item.id === id);
-
+    
             if (index > -1) {
                 cart[index].quantity += 1;
             } else {
                 cart.push({ id, name, price, image, quantity: 1 });
             }
-
+    
             localStorage.setItem('chairCart', JSON.stringify(cart));
             updateCartBadge();
             alert(`${name} added to cart!`);
         };
-
-        // 3. UI HELPER: Update Navbar Badge
+    
+        // 3. NAVBAR BADGE UPDATE
         function updateCartBadge() {
             const cart = JSON.parse(localStorage.getItem('chairCart')) || [];
             const total = cart.reduce((sum, item) => sum + item.quantity, 0);
-            document.getElementById('globalCartCount').innerText = total;
+            const badge = document.getElementById('globalCartCount');
+            if (badge) badge.innerText = total;
         }
-
+    
+        // 4. FILTER LOGIC (SEARCH & PRICE)
+        function filterDisplay() {
+            const searchTerm = document.getElementById('chairSearch').value.toLowerCase();
+            const maxPrice = parseFloat(document.getElementById('priceFilter').value);
+            const products = document.querySelectorAll('#productContainer .col');
+    
+            products.forEach(productCard => {
+                const name = productCard.querySelector('h5').innerText.toLowerCase();
+                const priceText = productCard.querySelector('.text-primary').innerText;
+                const price = parseFloat(priceText.replace('$', ''));
+    
+                const matchesSearch = name.includes(searchTerm);
+                const matchesPrice = price <= maxPrice;
+    
+                if (matchesSearch && matchesPrice) {
+                    productCard.style.display = "block";
+                } else {
+                    productCard.style.display = "none";
+                }
+            });
+        }
+    
+        // 5. EVENT LISTENERS FOR FILTERS
+        document.getElementById('chairSearch').addEventListener('input', filterDisplay);
+        document.getElementById('priceFilter').addEventListener('input', (e) => {
+            document.getElementById('priceDisplay').innerText = `$${e.target.value}`;
+            filterDisplay();
+        });
+    
+        // START
         loadProducts();
     </script>
 </body>
